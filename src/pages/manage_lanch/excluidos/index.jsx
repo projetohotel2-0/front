@@ -13,9 +13,6 @@ export default function ListExcluidaLanch(){
 
   const [show, setShow] = useState(false);
 
-
-
-
   const [idLanche, setIdlanche]= useState('')
   const [nomeLanche, setNomelanche] = useState('');
   
@@ -147,7 +144,7 @@ const handleRestore = (id) => {
         <Modal.Header closeButton>
           <Modal.Title>{nomeLanche}</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Descrição do lanche</Modal.Body>
+        {/* <Modal.Body>Descrição do lanche</Modal.Body> */}
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
             Cancelar
