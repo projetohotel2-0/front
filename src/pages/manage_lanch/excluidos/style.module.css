@@ -1,0 +1,23 @@
+.fundoBGLista{
+    display: flex;
+    background-color: rgb(17 24 39);
+    width: 99vw;
+    margin: auto;
+}
+
+.headerPromo{
+    background-color: orange;
+    color: white;
+    font-size: 12px;
+    padding: 2px;
+    display: flex;
+    justify-content: center;
+}
+.headerPromoOff{
+    background-color: rgb(165, 20, 20);
+    color: white;
+    font-size: 12px;
+    padding: 2px;
+    display: flex;
+    justify-content: center;
+}
