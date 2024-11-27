@@ -3,8 +3,9 @@ import style from '../cad_lanche/style.module.css';
 import React, { useState } from 'react';
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import PoUpSuccess from '../../components/popups/index'
-import Link from 'next/link'
+import PoUpSuccess from '../../components/popups/index';
+import Link from 'next/link';
+import Header from '../../components/header/index'
 //import axios from 'axios';
 
 
@@ -103,13 +104,13 @@ export default function cadastroLanche(){
 
 
     return(
+      <div>
+        <Header/>
         <div className={style.divFundoCadLanc}>
-          <h3><Link href="listas/lanches" className={style.linkverlanche}>Ver lanches</Link></h3>
+          {/* <h3><Link href="listas/lanches" className={style.linkverlanche}>Ver lanches</Link></h3> */}
           
         <div className={style.divFormulario}>
-          
-        
-            
+
             <form onSubmit={handleSubmit}>
       <div className="space-y-12">
         <div className="border-b border-gray-900/10 pb-12">
@@ -354,6 +355,7 @@ onChange={handleChange}
         <PoUpSuccess/>
         }
         
+        </div>
         </div>
     )
 }

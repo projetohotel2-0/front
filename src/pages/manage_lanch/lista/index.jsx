@@ -7,10 +7,12 @@ import Link from 'next/link';
 import Style from './style.module.css'
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
+import Header from '../../../components/header/index'
+
 
 export default function ListLanchManage(){
 
-
+    const [imageBase64, setImageBase64] = useState(null);
     const [show, setShow] = useState(false);
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -37,21 +39,36 @@ export default function ListLanchManage(){
       const fetchUsers = async () => {
         try {
           const res = await fetch('http://127.0.0.1:8000/api/lanches');
-  
-          // Verifique se a resposta está ok (status 200-299)
-          if (!res.ok) {
-            throw new Error(`Erro na requisição: ${res.statusText}`);
-          }
-  
+
           const data = await res.json(); // Converte a resposta para JSON
           setUsers(data);
-        } catch (err) {
+        
+        console.log(data.name)
+ 
+        data.forEach((item) => {
+          // console.log("Imagens do lanche:", item.images);
+          if (item.images) {
+            try {
+              const imageData = JSON.parse(item.images);
+              // console.log("Base64 decodificada:", imageData.base64);
+              setImageBase64(imageData);
+            } catch (e) {
+              console.error("Erro ao decodificar as imagens:", e.message);
+            }
+          } else {
+            console.error("Imagens não encontradas para o lanche:", item.name);
+          }
+        });
+        
+      } catch (err) {
+          console.log("o erro: ",err.message)
           setError(err.message); // Salva a mensagem de erro
         } finally {
           setLoading(false); // Finaliza o estado de carregamento
         }
-      };
-
+      
+          };
+    
 
       fetchUsers();
     }, []);
@@ -111,7 +128,8 @@ const handleDelete = (id) => {
     return(
       
       <div>
-      <div>
+
+    <Header/>
      
       <div className={Style.fundoBGLista}>
       <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
@@ -127,12 +145,26 @@ const handleDelete = (id) => {
                {user.promotion === 'Produto sem promoção' &&
               <h5 className={Style.headerPromoOff}>Promoção: {user.promotion}</h5>
               }
-              
+              {/* {imageBase64 &&
                 <Image
                  onClick={()=>handleShow(user.id, user.name, user.description)}
-                 src={images}
+                 src={imageBase64}
+                  alt="Imagem do Lanche"
                   className="h-full w-full object-cover object-center group-hover:opacity-75"
                 />
+              } */}
+              
+
+                 {imageBase64 ? (
+                      <img src={imageBase64} alt="Lanche Especial" />
+                  ) : (
+                      <p>Carregando imagem...</p>
+                  )} 
+{/* <img
+ src={`data:image/jpeg;base64,${item.images}`}
+  alt="Imagem do Lanche"
+  style={{ width: "200px", height: "200px" }}
+/> */}
 
               </div>
               <div className=" flex justify-between">
@@ -171,6 +203,6 @@ const handleDelete = (id) => {
       </Modal>
       
     </div>
-        </div>
+        
     )
 }

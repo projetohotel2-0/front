@@ -7,6 +7,7 @@ import Image from 'next/image';
 import Style from './style.module.css'
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
+import Header from '../../../components/header/index'
 
 export default function ListExcluidaLanch(){
 
@@ -76,6 +77,7 @@ const restore = async (id) => {
        
         console.log("Registro restaurado com sucesso!");
         alert("Registro restaurado com sucesso!");
+        window.location.reload();
       } else {
         // Trata status HTTP não-200
         console.error(`Erro na requisição: ${response.status}`);
@@ -101,9 +103,11 @@ const handleRestore = (id) => {
 //-------------------------------------------Deletar lanches ----------------------------------------
 
     return(
+      
 
       <div>
-     
+     <Header/>
+      
       <div className={Style.fundoBGLista}>
       <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
         <h2 className="sr-only">Products</h2>
