@@ -1,9 +1,9 @@
 
 import { useState, useEffect } from 'react';
 import React from 'react';
-import images from '../../../assets/image/comida.jpg';
-import Image from 'next/image';
-import Link from 'next/link';
+// import images from '../../../assets/image/comida.jpg';
+// import Image from 'next/image';
+// import Link from 'next/link';
 import Style from './style.module.css'
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
@@ -12,16 +12,14 @@ import Header from '../../../components/header/index'
 
 export default function ListLanchManage(){
 
-    const [imageBase64, setImageBase64] = useState(null);
     const [show, setShow] = useState(false);
-    const [users, setUsers] = useState([]);
+    const [lanches, setLanches] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const [idLanche, setIdlanche] = useState('');
     const [nomeLanche, setNomelanche] = useState('');
     const [descricao, setDescricao] = useState('');
-    const [records, setRecords] = useState([]);
   
     const handleClose = () => setShow(false);
     const handleShow = (idLanche, nomeLanche, descricao) => {
@@ -36,41 +34,33 @@ export default function ListLanchManage(){
 
     //-----------------------------------Listar Lanches-------------------------------
     useEffect(() => {
-      const fetchUsers = async () => {
+      const fetchLanches = async () => {
         try {
           const res = await fetch('http://127.0.0.1:8000/api/lanches');
 
           const data = await res.json(); // Converte a resposta para JSON
-          setUsers(data);
-        
-        console.log(data.name)
- 
-        data.forEach((item) => {
-          // console.log("Imagens do lanche:", item.images);
-          if (item.images) {
-            try {
-              const imageData = JSON.parse(item.images);
-              // console.log("Base64 decodificada:", imageData.base64);
-              setImageBase64(imageData);
-            } catch (e) {
-              console.error("Erro ao decodificar as imagens:", e.message);
-            }
-          } else {
-            console.error("Imagens não encontradas para o lanche:", item.name);
-          }
-        });
-        
-      } catch (err) {
-          console.log("o erro: ",err.message)
-          setError(err.message); // Salva a mensagem de erro
-        } finally {
-          setLoading(false); // Finaliza o estado de carregamento
-        }
-      
-          };
     
+      const lanchesImages = data.map((item) => {
+        let image = null;
+        try {
+          const imageData = JSON.parse(item.images); // Decodifica imagens, se necessário
+          image = imageData.base64; // Supondo que a base64 esteja nesse formato
+        } catch (e) {
+          console.error("Erro ao processar imagem:", e.message);
+        }
+        return { ...item, image }; // Adiciona a imagem ao objeto do usuário
+      });
 
-      fetchUsers();
+      setLanches(lanchesImages);
+    } catch (err) {
+      console.log("Erro:", err.message);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+      fetchLanches();
     }, []);
   
     if (loading) return <p>Carregando...</p>;
@@ -89,8 +79,6 @@ const deleteRecord = async (id) => {
         },
       });
 
-     
-  
       // Verifica se a requisição foi bem-sucedida
       if (response.ok) {
         // Caso a API retorne JSON, processa o dado
@@ -136,43 +124,33 @@ const handleDelete = (id) => {
         <h2 className="sr-only">Products</h2>
 
         <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-          {users.map((user) => (
-            <a key={user.id}  className="group">
+          {lanches.map((lanch) => (
+            <a key={lanch.id}  className="group">
               <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
-              {user.promotion != 'Produto sem promoção' &&
-              <h5 className={Style.headerPromo}>Promoção: {user.promotion}</h5>
+              {lanch.promotion != 'Produto sem promoção' &&
+              <h5 className={Style.headerPromo}>Promoção: {lanch.promotion}</h5>
               } 
-               {user.promotion === 'Produto sem promoção' &&
-              <h5 className={Style.headerPromoOff}>Promoção: {user.promotion}</h5>
+               {lanch.promotion === 'Produto sem promoção' &&
+              <h5 className={Style.headerPromoOff}>Promoção: {lanch.promotion}</h5>
               }
-              {/* {imageBase64 &&
-                <Image
-                 onClick={()=>handleShow(user.id, user.name, user.description)}
-                 src={imageBase64}
-                  alt="Imagem do Lanche"
-                  className="h-full w-full object-cover object-center group-hover:opacity-75"
-                />
-              } */}
-              
-
-                 {imageBase64 ? (
-                      <img src={imageBase64} alt="Lanche Especial" />
-                  ) : (
-                      <p>Carregando imagem...</p>
-                  )} 
-{/* <img
- src={`data:image/jpeg;base64,${item.images}`}
-  alt="Imagem do Lanche"
-  style={{ width: "200px", height: "200px" }}
-/> */}
+             
+              {lanch.image && (
+                  <img
+                    src={lanch.image}
+                    alt={`Imagem de ${lanch.name}`}
+                    onClick={() => handleShow(lanch.id, lanch.name, lanch.description)}
+                    className="h-full w-full object-cover object-center group-hover:opacity-75"
+                  />
+            
+              )}
 
               </div>
               <div className=" flex justify-between">
-                <h3 className="text-lg text-white">{user.name}</h3>
-                <h3 className="text-sm font-medium text-white">R$ {user.discount}</h3>  
+                <h3 className="text-lg text-white">{lanch.name}</h3>
+                <h3 className="text-sm font-medium text-white">R$ {lanch.discount}</h3>  
               </div>
               <div>
-                <div><p className="mt-1 text-sm font-small text-white">{user.description}</p></div>        
+                <div><p className="mt-1 text-sm font-small text-white">{lanch.description}</p></div>        
               </div>
 
             </a>
