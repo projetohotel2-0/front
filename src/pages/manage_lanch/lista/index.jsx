@@ -1,8 +1,8 @@
 
 import { useState, useEffect } from 'react';
 import React from 'react';
-// import images from '../../../assets/image/comida.jpg';
-// import Image from 'next/image';
+import imagesModel from '../../../assets/image/lanchemodel.jpg';
+import Image from 'next/image';
 // import Link from 'next/link';
 import Style from './style.module.css'
 import Button from 'react-bootstrap/Button';
@@ -141,7 +141,16 @@ const handleDelete = (id) => {
                     onClick={() => handleShow(lanch.id, lanch.name, lanch.description)}
                     className="h-full w-full object-cover object-center group-hover:opacity-75"
                   />
-            
+
+              )}
+              {lanch.image == '' && (
+                  <Image
+                    src={imagesModel}
+                    alt={`Imagem de ${lanch.name}`}
+                    onClick={() => handleShow(lanch.id, lanch.name, lanch.description)}
+                    className="h-full w-full object-cover object-center group-hover:opacity-75"
+                  />
+
               )}
 
               </div>

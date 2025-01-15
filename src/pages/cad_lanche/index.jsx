@@ -5,8 +5,8 @@ import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/re
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import PoUpSuccess from '../../components/popups/index';
 import Link from 'next/link';
-import Header from '../../components/header/index'
-//import axios from 'axios';
+import Header from '../../components/header/index';
+import axios from 'axios';
 
 
 export default function cadastroLanche(){
@@ -19,24 +19,24 @@ export default function cadastroLanche(){
         name: '',
         description: '',
         type: [],
-        promotion:'',
+        promotion: '',
         discount: '',
+        images: null
     });
 
     const [message, setMessage] = useState('');
     const [errors, setErrors] = useState({});
 
 
-    // const handleChangeNome = (e) => {
-    //   setName(e.target.value)
-    //   console.log('nome:', e.target.value)
-      
-    // }
-    // const handleChangeDescricao = (e) => {
-    //   setDescription(e.target.value)
-    //   console.log('descricao:',e.target.value)
-      
-    // }
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        });
+    };
+
+
+
     const handleChange2 = (e) => {
       const { name, value, checked } = e.target;
   
@@ -55,16 +55,8 @@ export default function cadastroLanche(){
       }
   };
 
-
-
-    
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
-    };
     const handleChange3 = (e) => {
+      
       const { name, value } = e.target;
       setFormData({
           ...formData,
@@ -72,35 +64,66 @@ export default function cadastroLanche(){
       });
   };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const response = await fetch('http://127.0.0.1:8000/api/lanches', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            });
 
-            if (response.ok) {
-                const data = await response.json();
-                setMessage(data.message);
-                setErrors({});
-                setOpen(true) 
+  //-------------usando axios
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Previne o comportamento padrão do formulário
+
+    try {
+        // Fazendo a requisição com axios
+        const response = await axios.post('http://127.0.0.1:8000/api/lanches', formData);
+
+        // Verifica se a requisição foi bem-sucedida
+        if (response.status === 200 || response.status === 201) {
+            setMessage(response.data.message); // Configura a mensagem de sucesso
+            setErrors({}); // Limpa os erros
+            setOpen(true); // Configura o estado de sucesso/abertura
+        }
+    } catch (error) {
+        // Trata os erros
+        if (error.response && error.response.status === 400) {
+            // Erros de validação retornados pelo backend
+            setErrors('apareceu isso: ',error.response.data.errors);
+        } 
+          else {
+            // Outros erros, como problemas de rede
+            setMessage('Something went wrong. Please try again later.');
+        }
+    }
+};
+
+if (open) return <PoUpSuccess/>;
+
+  //---------------usando fetch
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault();
+    //     try {
+    //         const response = await fetch('http://127.0.0.1:8000/api/lanches', {
+    //             method: 'POST',
+    //             // headers: {
+    //             //     'Content-Type': 'application/json'
+    //             // },
+                
+    //             body: JSON.stringify(formData)
+    //         });
+
+    //         if (response.ok) {
+    //             const data = await response.json();
+    //             setMessage(data.message);
+    //             setErrors({});
+    //             setOpen(true) 
                
 
-            } else if (response.status === 400) {
-                const errorData = await response.json();
-                setErrors(errorData.errors);
-            } else {
-                setMessage('Something went wrong. Please try again later.');
-            }
-        } catch (error) {
-            setMessage('Network error. Please try again later.');
-        }
-    };
-    // if (open) return <PoUpSuccess/>;
+    //         } else if (response.status === 400) {
+    //             const errorData = await response.json();
+    //             setErrors(errorData.errors);
+    //         } else {
+    //             setMessage('Something went wrong. Please try again later.');
+    //         }
+    //     } catch (error) {
+    //         setMessage('Network error. Please try again later.');
+    //     }
+    // };
 
 
     return(
@@ -262,8 +285,10 @@ onChange={handleChange}
                     name="promotion"
                     type="radio"
                     className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                    onChange={handleChange} // Função para atualizar o estado
-                    checked={formData.promotion === "Tudo é meia"} // Mantém o estado sincronizado
+                    value='Tudo é meia' // Valor único
+                    
+                    //checked={formData.promotion === "Tudo é meia"} // Mantém o estado sincronizado
+                    onChange={handleChange3} // Função para atualizar o estado
                   />
                   <label htmlFor="push-everything" className="block text-sm/6 font-medium text-gray-900">
                     Tudo é meia
@@ -275,9 +300,10 @@ onChange={handleChange}
                     name="promotion"
                     type="radio"
                     className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                    value="Compre 2 e leve + 1" // Valor único
+                    value='Compre 2 e leve + 1' // Valor único
+       
+        //checked={formData.promotion === "Compre 2 e leve + 1"}
         onChange={handleChange3}
-        checked={formData.promotion === "Compre 2 e leve + 1"}
                   />
                   <label htmlFor="push-email" className="block text-sm/6 font-medium text-gray-900">
                     Compre 2 e leve + 1
@@ -289,9 +315,10 @@ onChange={handleChange}
                     name="promotion"
                     type="radio"
                     className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                    value="Coma tudo grátis ou pague o dobro" // Valor único
+                    value='Coma tudo grátis ou pague o dobro' // Valor único
+       
+        //checked={formData.promotion === "Coma tudo grátis ou pague o dobro"}
         onChange={handleChange3}
-        checked={formData.promotion === "Coma tudo grátis ou pague o dobro"}
                   />
                   <label htmlFor="push-nothing" className="block text-sm/6 font-medium text-gray-900">
                     Coma tudo grátis ou pague o dobro
@@ -303,9 +330,10 @@ onChange={handleChange}
                     name="promotion"
                     type="radio"
                     className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                    value="Produto sem promoção" // Valor único
+                    value='Produto sem promoção' // Valor único
+        
+        //checked={formData.promotion === "Produto sem promoção"}
         onChange={handleChange3}
-        checked={formData.promotion === "Produto sem promoção"}
                   />
                   <label htmlFor="push-nothing" className="block text-sm/6 font-medium text-gray-900">
                     Produto sem promoção
